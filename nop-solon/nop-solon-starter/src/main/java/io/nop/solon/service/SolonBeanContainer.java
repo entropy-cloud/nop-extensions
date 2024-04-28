@@ -1,7 +1,6 @@
 package io.nop.solon.service;
 
 import io.nop.api.core.ioc.IBeanContainer;
-import org.jetbrains.annotations.NotNull;
 import org.noear.solon.core.BeanContainer;
 
 import java.lang.annotation.Annotation;
@@ -44,7 +43,6 @@ public class SolonBeanContainer implements IBeanContainer {
         return true;
     }
 
-    @NotNull
     @Override
     public Object getBean(String name) {
         return beanContainer.getBean(name);
@@ -55,7 +53,6 @@ public class SolonBeanContainer implements IBeanContainer {
         return !beanContainer.getWrapsOfType(aClass).isEmpty();
     }
 
-    @NotNull
     @Override
     public <T> T getBeanByType(Class<T> aClass) {
         return beanContainer.getBean(aClass);
