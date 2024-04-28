@@ -1,0 +1,6 @@
+server:
+  port: 8050
+
+server.http.gzip.enable: true
+
+solon.staticfiles.enable: true
