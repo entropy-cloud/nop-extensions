@@ -20,33 +20,33 @@
     </properties>
 
     <modules>
-        <module>nop-solon-starter</module>
+        <module>nop-solon-plugin</module>
         <module>nop-solon-demo</module>
         <module>nop-solon-service-demo</module>
     </modules>
 
     <repositories>
         <!-- 中央仓库 -->
-<!--        <repository>-->
-<!--            <id>central</id>-->
-<!--            <url>https://repo1.maven.apache.org/maven2</url>-->
-<!--            <releases>-->
-<!--                <enabled>true</enabled>-->
-<!--            </releases>-->
-<!--            <snapshots>-->
-<!--                <enabled>false</enabled>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
-<!--        &lt;!&ndash; 自定义仓库1 &ndash;&gt;-->
-<!--        <repository>-->
-<!--            <id>nop-snapshot-repo</id>-->
-<!--            <url>https://nop.repo.crazydan.io/</url>-->
-<!--            <releases>-->
-<!--                <enabled>false</enabled>-->
-<!--            </releases>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- 自定义仓库1 -->
+        <repository>
+            <id>nop-snapshot-repo</id>
+            <url>https://nop.repo.crazydan.io/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 </project>

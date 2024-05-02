@@ -13,8 +13,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-api</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.github.entropy-cloud.extensions</groupId>
-            <artifactId>nop-solon-starter</artifactId>
+            <artifactId>nop-solon-plugin</artifactId>
             <version>1.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
