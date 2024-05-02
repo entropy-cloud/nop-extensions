@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <solon.version>2.7.5</solon.version>
+        <solon.version>2.7.6</solon.version>
     </properties>
 
     <modules>
