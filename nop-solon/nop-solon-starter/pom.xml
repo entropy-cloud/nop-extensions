@@ -12,13 +12,13 @@
     <artifactId>nop-solon-starter</artifactId>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon-api</artifactId>
-            <version>${solon.version}</version>
-        </dependency>
-
+        <!-- todo: 一般插件模块里不引入 http-server 相关组件（不方便切换选择不同的方案） -->
+<!--        <dependency>-->
+<!--            <groupId>org.noear</groupId>-->
+<!--            <artifactId>solon-api</artifactId>-->
+<!--            <version>${solon.version}</version>-->
+<!--        </dependency>-->
+        <!-- todo: 一般引入需要的能力即好 -->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.web.staticfiles</artifactId>

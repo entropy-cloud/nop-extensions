@@ -12,6 +12,13 @@
     <artifactId>nop-solon-demo</artifactId>
 
     <dependencies>
+        <!-- todo: 一般在主模块里引入 http-server 相关组件（方便切换选择不同的方案） -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-api</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.github.entropy-cloud.extensions</groupId>
             <artifactId>nop-solon-starter</artifactId>
