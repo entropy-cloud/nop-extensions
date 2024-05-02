@@ -1,0 +1,65 @@
+server:
+  port: 8050
+  http.gzip.enable: true
+
+
+# todo: 静态文件默认是启用了（可以不用配置）
+# solon.staticfiles.enable: true
+
+# todo: application.yml 未来会删掉，不建议使用了（如果这块配置要独立，可用：solon.config.load 进行加载）
+nop:
+  debug: true
+  auth:
+    site-map:
+      static-config-path: /nop/demo/app.action-auth.xml
+      cache-timeout: 1s
+      support-debug: true
+
+    data-auth-config-path: /nop/demo/app.data-auth.xml
+    enable-data-auth: true
+    # enable-action-auth: true
+
+    login:
+      allow-create-default-user: true # 如果用户表为空，则自动创建缺省账户nop, 密码nop-test
+      use-dao-user-context-cache: true
+
+    web:
+      validate-page-model: true
+
+    jwt:
+      enc-key: dij3)(4ldt[]erq=2mfKID
+
+  orm:
+    init-database-schema: true
+    enable-tenant-by-default: true
+    auto-add-tenant-col: true
+
+  datasource:
+    #    driver-class-name: org.h2.Driver
+    #    jdbc-url: jdbc:h2:./db/test
+    #    username: sa
+    #    password:
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    # jdbc-url: jdbc:mysql://127.0.0.1:3306/dev?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    # username: nop
+    # password: nop-test
+    metrics-enabled: true
+    driver-class-name: org.h2.Driver
+    jdbc-url: jdbc:h2:./db/test
+    username: sa
+    password:
+
+  gateway:
+    http-filter:
+      enabled: true
+
+  file:
+  #store-impl: oss
+
+  integration:
+    oss:
+      enabled: false
+      endpoint: http://localhost:9000
+      access-key: nop
+      secret-key: nop-test
+

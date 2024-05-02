@@ -1,23 +1,81 @@
-# Compiled class file
-*.class
+#Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+.flattened-pom.xml
 
-# Log file
-*.log
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
 
-# BlueJ files
-*.ctxt
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# NetBeans
+nb-configuration.xml
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Visual Studio Code
+.vscode
+.factorypath
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# OSX
+.DS_Store
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+# Plugin directory
+/.quarkus/cli/plugins/
+
+/nop-antlr4/nop-antlr4-playground/gen
+/nop-antlr4/nop-antlr4-playground/src/main/antlr4/imports/.antlr
+/nop-antlr4/nop-antlr4-playground/src/main/antlr4/imports/gen
+/nop-xlang/gen/antlr
+/nop-xlang/gen
+/nop-antlr4/nop-antlr4-tool/gen/antlr4/xlang
+/nop-idea-plugin/.gradle/7.2
+/nop-idea-plugin/build
+/nop-idea-plugin/.gradle
+/nop-idea-plugin/nop-idea-plugin.jar
+.antlr
+/nop-idea-plugin/bin
+/log
+_dump
+/db
+/nop-antlr4/gen
+/nop-antlr4/nop-antlr4-xlang/src/main/antlr4/imports/gen
+/nop-antlr4/nop-antlr4-xpath/src/main/antlr4/imports/gen
+/nop-tool/src/test/java/io/nop/tool/log/TestLogProcessor.java
+/nop-all-for-spring/dependency-reduced-pom.xml
+
+package-lock.json
+node_modules/
+
+# KnoSys sites
+/.knosys/sites/default/source/_data/knosys/
+/.knosys/sites/default/source/_data/local/repos.yml
+/.knosys/sites/default/source/knosys/
+/.knosys/sites/default/source/_posts/*
+!/.knosys/sites/default/source/_posts/hello-world.md
+/.knosys/sites/default/themes/
+/.knosys/sites/default/public/
+/.knosys/sites/default/.deploy*/
+/.knosys/sites/default/_multiconfig.yml
+/.knosys/sites/default/Thumbs.db
+/.knosys/sites/default/db.json
+/.knosys/sites/default/package.json
