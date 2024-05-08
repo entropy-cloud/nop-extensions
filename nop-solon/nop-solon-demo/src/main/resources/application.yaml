@@ -13,7 +13,7 @@ nop:
     # enable-action-auth: true
 
     login:
-      allow-create-default-user: true # 如果用户表为空，则自动创建缺省账户nop, 密码nop-test
+      allow-create-default-user: true # 如果用户表为空，则自动创建缺省账户nop, 密码123
       use-dao-user-context-cache: true
 
     web:

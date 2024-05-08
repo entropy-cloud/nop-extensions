@@ -5,5 +5,5 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd" xmlns:ioc="ioc">
-    <bean id="io.nop.solon.demo.biz.ReportDemoBizModel" ioc:type="@bean:id" />
+    <bean id="io.nop.extensions.demo.biz.ReportDemoBizModel" ioc:type="@bean:id" />
 </beans>

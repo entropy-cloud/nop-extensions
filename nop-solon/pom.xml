@@ -6,13 +6,14 @@
 
     <parent>
         <groupId>io.github.entropy-cloud</groupId>
-        <artifactId>nop-entropy</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <artifactId>nop-extensions</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>io.github.entropy-cloud.extensions</groupId>
     <artifactId>nop-solon</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -25,28 +26,24 @@
         <module>nop-solon-service-demo</module>
     </modules>
 
-    <repositories>
-        <!-- 中央仓库 -->
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- 自定义仓库1 -->
-        <repository>
-            <id>nop-snapshot-repo</id>
-            <url>https://nop.repo.crazydan.io/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.github.entropy-cloud.extensions</groupId>
+                <artifactId>nop-solon-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>solon-api</artifactId>
+                <version>${solon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>solon.web.staticfiles</artifactId>
+                <version>${solon.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
