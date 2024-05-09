@@ -13,6 +13,7 @@ import io.nop.api.core.convert.ConvertHelper;
 import io.nop.api.core.exceptions.NopException;
 import io.nop.commons.util.StringHelper;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
 /**
@@ -72,6 +73,13 @@ public class UndertowWebHelper {
     }
 
     public static void send(HttpServerExchange exchange, String text) {
+        send(exchange, text, null);
+    }
+
+    public static void send(HttpServerExchange exchange, String text, String contentType) {
+        if (contentType != null) {
+            setResponseHeader(exchange, Headers.CONTENT_TYPE_STRING, contentType);
+        }
         exchange.getResponseSender().send(text, StandardCharsets.UTF_8);
     }
 
