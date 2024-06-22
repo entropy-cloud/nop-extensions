@@ -52,6 +52,11 @@ public class UndertowHttpServerContext implements IHttpServerContext {
     }
 
     @Override
+    public Map<String, String> getQueryParams() {
+        return UndertowWebHelper.getQueryParams(this.exchange);
+    }
+
+    @Override
     public Map<String, Object> getRequestHeaders() {
         return UndertowWebHelper.getRequestHeaders(this.exchange);
     }
