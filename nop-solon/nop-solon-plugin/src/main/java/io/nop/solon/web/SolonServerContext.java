@@ -10,6 +10,7 @@ import org.noear.solon.core.handle.Context;
 
 import java.net.HttpCookie;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
@@ -41,6 +42,15 @@ public class SolonServerContext implements IHttpServerContext {
     @Override
     public String getQueryParam(String name) {
         return context.param(name);
+    }
+
+    @Override
+    public Map<String, String> getQueryParams() {
+        Map<String, String> params = new LinkedHashMap<>();
+        for (String name : context.paramsMap().keySet()) {
+            params.put(name, getQueryParam(name));
+        }
+        return params;
     }
 
     @Override
