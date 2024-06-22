@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.aot</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.github.entropy-cloud.extensions</groupId>
             <artifactId>nop-solon-plugin</artifactId>
         </dependency>
