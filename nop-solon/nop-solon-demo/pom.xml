@@ -34,6 +34,12 @@
             <artifactId>nop-demo</artifactId>
         </dependency>
 
+        <!-- native编译在调试阶段需要 -->
+        <dependency>
+            <groupId>io.github.entropy-cloud</groupId>
+            <artifactId>nop-codegen</artifactId>
+        </dependency>
+
         <!-- 以下所有包都是可选的 -->
 
         <!-- 用户管理和权限认证 -->
@@ -155,4 +161,57 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.noear</groupId>
+                        <artifactId>solon-maven-plugin</artifactId>
+                        <version>${solon.version}</version>
+                        <executions>
+                            <execution>
+                                <id>process-aot</id>
+                                <goals>
+                                    <goal>process-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.codehaus.plexus</groupId>
+                                <artifactId>plexus-utils</artifactId>
+                                <version>3.5.1</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.9.28</version>
+                        <!-- 使用graalvm提供的可达性元数据，很多第三方库就直接可以构建成可执行文件了 -->
+                        <configuration>
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+<!--                            <buildArgs combine.children="append">-->
+<!--                                <buildArg>-H:+AddAllCharsets</buildArg>-->
+<!--                            </buildArgs>-->
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>add-reachability-metadata</id>
+                                <goals>
+                                    <goal>add-reachability-metadata</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

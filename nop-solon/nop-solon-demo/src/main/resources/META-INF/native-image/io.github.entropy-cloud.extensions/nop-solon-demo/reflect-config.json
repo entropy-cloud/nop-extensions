@@ -14,6 +14,501 @@
     "allDeclaredMethods": true,
     "allPublicConstructors": true,
     "allPublicMethods": true,
+    "fields": [],
+    "methods": [
+      {
+        "name": "addDataSourceProperty",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "addHealthCheckProperty",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "copyStateTo",
+        "parameterTypes": [
+          "com.zaxxer.hikari.HikariConfig"
+        ]
+      },
+      {
+        "name": "getCatalog",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionInitSql",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionTestQuery",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSource",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceJNDI",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceProperties",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDriverClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getExceptionOverrideClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getHealthCheckProperties",
+        "parameterTypes": []
+      },
+      {
+        "name": "getHealthCheckRegistry",
+        "parameterTypes": []
+      },
+      {
+        "name": "getIdleTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getInitializationFailTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getJdbcUrl",
+        "parameterTypes": []
+      },
+      {
+        "name": "getKeepaliveTime",
+        "parameterTypes": []
+      },
+      {
+        "name": "getLeakDetectionThreshold",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaxLifetime",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaximumPoolSize",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMetricRegistry",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMetricsTrackerFactory",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMinimumIdle",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPassword",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPoolName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getScheduledExecutor",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSchema",
+        "parameterTypes": []
+      },
+      {
+        "name": "getThreadFactory",
+        "parameterTypes": []
+      },
+      {
+        "name": "getTransactionIsolation",
+        "parameterTypes": []
+      },
+      {
+        "name": "getUsername",
+        "parameterTypes": []
+      },
+      {
+        "name": "getValidationTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAllowPoolSuspension",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAutoCommit",
+        "parameterTypes": []
+      },
+      {
+        "name": "isIsolateInternalQueries",
+        "parameterTypes": []
+      },
+      {
+        "name": "isReadOnly",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRegisterMbeans",
+        "parameterTypes": []
+      },
+      {
+        "name": "seal",
+        "parameterTypes": []
+      },
+      {
+        "name": "setAllowPoolSuspension",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setAutoCommit",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setCatalog",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setConnectionInitSql",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setConnectionTestQuery",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setConnectionTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setDataSource",
+        "parameterTypes": [
+          "javax.sql.DataSource"
+        ]
+      },
+      {
+        "name": "setDataSourceClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDataSourceJNDI",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDataSourceProperties",
+        "parameterTypes": [
+          "java.util.Properties"
+        ]
+      },
+      {
+        "name": "setDriverClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setExceptionOverrideClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setHealthCheckProperties",
+        "parameterTypes": [
+          "java.util.Properties"
+        ]
+      },
+      {
+        "name": "setHealthCheckRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setIdleTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setInitializationFailTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setIsolateInternalQueries",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setJdbcUrl",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setKeepaliveTime",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setLeakDetectionThreshold",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setMaxLifetime",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setMaximumPoolSize",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setMetricRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setMetricsTrackerFactory",
+        "parameterTypes": [
+          "com.zaxxer.hikari.metrics.MetricsTrackerFactory"
+        ]
+      },
+      {
+        "name": "setMinimumIdle",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setPassword",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setPoolName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setReadOnly",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setRegisterMbeans",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setScheduledExecutor",
+        "parameterTypes": [
+          "java.util.concurrent.ScheduledExecutorService"
+        ]
+      },
+      {
+        "name": "setSchema",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setThreadFactory",
+        "parameterTypes": [
+          "java.util.concurrent.ThreadFactory"
+        ]
+      },
+      {
+        "name": "setTransactionIsolation",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setUsername",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setValidationTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "validate",
+        "parameterTypes": []
+      }
+    ],
+    "name": "com.zaxxer.hikari.HikariConfig",
+    "unsafeAllocated": false
+  },
+  {
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "allPublicMethods": true,
+    "fields": [],
+    "methods": [
+      {
+        "name": "close",
+        "parameterTypes": []
+      },
+      {
+        "name": "evictConnection",
+        "parameterTypes": [
+          "java.sql.Connection"
+        ]
+      },
+      {
+        "name": "getConnection",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnection",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "getHikariConfigMXBean",
+        "parameterTypes": []
+      },
+      {
+        "name": "getHikariPoolMXBean",
+        "parameterTypes": []
+      },
+      {
+        "name": "getLogWriter",
+        "parameterTypes": []
+      },
+      {
+        "name": "getLoginTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getParentLogger",
+        "parameterTypes": []
+      },
+      {
+        "name": "isClosed",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRunning",
+        "parameterTypes": []
+      },
+      {
+        "name": "isWrapperFor",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "setHealthCheckRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setLogWriter",
+        "parameterTypes": [
+          "java.io.PrintWriter"
+        ]
+      },
+      {
+        "name": "setLoginTimeout",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setMetricRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setMetricsTrackerFactory",
+        "parameterTypes": [
+          "com.zaxxer.hikari.metrics.MetricsTrackerFactory"
+        ]
+      },
+      {
+        "name": "toString",
+        "parameterTypes": []
+      },
+      {
+        "name": "unwrap",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      }
+    ],
+    "name": "com.zaxxer.hikari.HikariDataSource",
+    "unsafeAllocated": false
+  },
+  {
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "allPublicMethods": true,
     "fields": [
       {
         "allowUnsafeAccess": false,
@@ -18376,6 +18871,42 @@
     "allDeclaredMethods": true,
     "allPublicConstructors": true,
     "allPublicMethods": true,
+    "fields": [
+      {
+        "allowUnsafeAccess": false,
+        "allowWrite": false,
+        "name": "LOG"
+      },
+      {
+        "allowUnsafeAccess": false,
+        "allowWrite": true,
+        "name": "s_instance"
+      }
+    ],
+    "methods": [
+      {
+        "name": "instance",
+        "parameterTypes": []
+      },
+      {
+        "name": "print",
+        "parameterTypes": []
+      },
+      {
+        "name": "registerInstance",
+        "parameterTypes": [
+          "io.micrometer.core.instrument.MeterRegistry"
+        ]
+      }
+    ],
+    "name": "io.nop.commons.metrics.GlobalMeterRegistry",
+    "unsafeAllocated": false
+  },
+  {
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "allPublicMethods": true,
     "fields": [],
     "methods": [
       {
@@ -36688,6 +37219,52 @@
     "fields": [
       {
         "allowUnsafeAccess": false,
+        "allowWrite": true,
+        "name": "reportEngine"
+      }
+    ],
+    "methods": [
+      {
+        "name": "download",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "downloadModel",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "getDemoReports",
+        "parameterTypes": []
+      },
+      {
+        "name": "getReportBeans",
+        "parameterTypes": [
+          "io.nop.core.resource.IResource"
+        ]
+      },
+      {
+        "name": "renderHtml",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ],
+    "name": "io.nop.extensions.demo.biz.ReportDemoBizModel",
+    "unsafeAllocated": false
+  },
+  {
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "allPublicMethods": true,
+    "fields": [
+      {
+        "allowUnsafeAccess": false,
         "allowWrite": false,
         "name": "IGNORE_HEADERS"
       }
@@ -39618,6 +40195,10 @@
         ]
       },
       {
+        "name": "getBeanValueType",
+        "parameterTypes": []
+      },
+      {
         "name": "getByAnnotation",
         "parameterTypes": []
       },
@@ -39667,6 +40248,12 @@
         "name": "setAsMap",
         "parameterTypes": [
           "boolean"
+        ]
+      },
+      {
+        "name": "setBeanValueType",
+        "parameterTypes": [
+          "java.lang.String"
         ]
       },
       {
@@ -40284,6 +40871,10 @@
         ]
       },
       {
+        "name": "getBeanValueType",
+        "parameterTypes": []
+      },
+      {
         "name": "getListClass",
         "parameterTypes": []
       },
@@ -40295,6 +40886,12 @@
         "name": "outputJson",
         "parameterTypes": [
           "io.nop.core.lang.json.IJsonHandler"
+        ]
+      },
+      {
+        "name": "setBeanValueType",
+        "parameterTypes": [
+          "java.lang.String"
         ]
       },
       {
@@ -40643,6 +41240,10 @@
         "parameterTypes": []
       },
       {
+        "name": "getBeanValueType",
+        "parameterTypes": []
+      },
+      {
         "name": "isIocIgnoreDepends",
         "parameterTypes": []
       },
@@ -40662,6 +41263,12 @@
       },
       {
         "name": "setBean",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setBeanValueType",
         "parameterTypes": [
           "java.lang.String"
         ]
@@ -40706,6 +41313,10 @@
         ]
       },
       {
+        "name": "getBeanValueType",
+        "parameterTypes": []
+      },
+      {
         "name": "getBody",
         "parameterTypes": []
       },
@@ -40721,6 +41332,12 @@
         "name": "outputJson",
         "parameterTypes": [
           "io.nop.core.lang.json.IJsonHandler"
+        ]
+      },
+      {
+        "name": "setBeanValueType",
+        "parameterTypes": [
+          "java.lang.String"
         ]
       },
       {
@@ -67933,6 +68550,16 @@
     "fields": [],
     "methods": [
       {
+        "name": "addProp",
+        "parameterTypes": [
+          "io.nop.xlang.xmeta.impl.ObjPropMetaImpl"
+        ]
+      },
+      {
+        "name": "cloneInstance",
+        "parameterTypes": []
+      },
+      {
         "name": "getAbstract",
         "parameterTypes": []
       },
@@ -68103,6 +68730,10 @@
         "parameterTypes": [
           "java.lang.String"
         ]
+      },
+      {
+        "name": "newInstance",
+        "parameterTypes": []
       },
       {
         "name": "setAbstract",
