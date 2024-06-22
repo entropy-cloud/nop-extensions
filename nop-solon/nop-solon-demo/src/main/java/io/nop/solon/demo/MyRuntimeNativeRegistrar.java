@@ -20,7 +20,6 @@ public class MyRuntimeNativeRegistrar implements RuntimeNativeRegistrar {
     @Override
     public void register(AppContext context, RuntimeNativeMetadata metadata) {
         metadata.registerReflection(LinkedHashMap.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
-        metadata.registerReflection(LinkedHashMap.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
         // metadata.registerReflection(ArrayList.class, MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS);
         metadata.registerReflection(UuidSequenceGenerator.class, MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS);
 
