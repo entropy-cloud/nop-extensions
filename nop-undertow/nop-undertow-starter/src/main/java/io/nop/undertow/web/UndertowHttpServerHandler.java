@@ -8,10 +8,12 @@ import io.nop.api.core.exceptions.NopException;
 import io.nop.api.core.ioc.BeanContainer;
 import io.nop.api.core.util.FutureHelper;
 import io.nop.api.core.util.OrderedComparator;
+import io.nop.commons.util.ClassHelper;
 import io.nop.http.api.server.HttpServerHelper;
 import io.nop.http.api.server.IHttpServerContext;
 import io.nop.http.api.server.IHttpServerFilter;
 import io.nop.undertow.UndertowConfigs;
+import io.nop.undertow.service.UndertowFileHandler;
 import io.nop.undertow.service.UndertowGraphQLHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -79,13 +81,23 @@ public class UndertowHttpServerHandler implements HttpHandler {
         // 对包含预压缩的资源（.gz 后缀），则优先返回其对应的压缩文件
         ResourceSupplier resourceSupplier = new PreCompressedResourceSupplier(resourceManager).addEncoding("gzip",
                                                                                                            ".gz");
-        HttpHandler resource = new ResourceHandler(resourceSupplier);
+        HttpHandler resourceHandler = new ResourceHandler(resourceSupplier);
 
         // Note: ResourceHandler 会在新线程中执行后继的 HttpHandler，
         // 从而导致在 Nop ContextProvider 中与当前线程绑定的变量无法在
         // ResourceHandler 的后继中获取到，因此，必须先在当前线程中执行
         // UndertowGraphQLHandler，再将未处理的请求交给 ResourceHandler
-        HttpHandler handler = new UndertowGraphQLHandler(resource);
+        HttpHandler handler = new UndertowGraphQLHandler(resourceHandler);
+
+        // 若运行环境引入了 nop-file，则启用文件上传和下载支持。
+        // Note: Undertow 没有扫描和自动注册机制，只能通过环境中是否存在特定的 class
+        // 来判断是否启用文件上传/下载能力
+        try {
+            ClassHelper.forName("io.nop.file.core.AbstractGraphQLFileService");
+
+            handler = new UndertowFileHandler(handler);
+        } catch (ClassNotFoundException ignore) {
+        }
 
         // 启用对响应的压缩支持
         if (UndertowConfigs.CFG_SERVER_COMPRESSION_ENABLED.get()) {

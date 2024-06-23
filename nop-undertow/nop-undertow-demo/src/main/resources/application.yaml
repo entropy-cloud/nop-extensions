@@ -24,7 +24,7 @@ nop:
 
   orm:
     init-database-schema: true
-    enable-tenant-by-default: true
+    enable-tenant-by-default: false
     auto-add-tenant-col: true
 
   datasource:
@@ -47,7 +47,8 @@ nop:
       enabled: true
 
   file:
-  #store-impl: oss
+    #store-impl: oss
+    store-dir: /tmp/nop-files
 
   integration:
     oss:

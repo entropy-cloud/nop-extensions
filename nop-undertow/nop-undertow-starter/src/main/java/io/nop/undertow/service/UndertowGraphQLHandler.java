@@ -1,17 +1,11 @@
 package io.nop.undertow.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.nop.api.core.beans.ApiResponse;
 import io.nop.api.core.beans.WebContentBean;
-import io.nop.api.core.exceptions.NopException;
-import io.nop.commons.util.IoHelper;
-import io.nop.core.resource.IResource;
 import io.nop.graphql.core.IGraphQLExecutionContext;
 import io.nop.graphql.core.ast.GraphQLOperationType;
 import io.nop.graphql.core.web.GraphQLWebService;
@@ -112,49 +106,22 @@ public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHan
     }
 
     protected Void outputJson(Map<String, Object> headers, String body, int status) {
+        HttpServerExchange exchange = UndertowContext.getExchange();
+
         headers.put(Headers.CONTENT_TYPE_STRING, WebContentBean.CONTENT_TYPE_JSON);
 
-        return sendData(headers, body, status);
+        UndertowWebHelper.send(exchange, headers, body, status);
+
+        return null;
     }
 
     protected Void outputPageQuery(ApiResponse<?> response, IGraphQLExecutionContext gqlContext) {
+        HttpServerExchange exchange = UndertowContext.getExchange();
         WebContentBean contentBean = buildWebContent(response);
 
-        return consumeWebContent(response, contentBean, this::sendData);
-    }
-
-    protected Void sendData(Map<String, Object> headers, Object body, int status) {
-        HttpServerExchange exchange = UndertowContext.getExchange();
-
-        UndertowWebHelper.setResponseHeader(exchange, headers);
-        exchange.setStatusCode(status);
-
-        if (body instanceof IResource) {
-            InputStream is = ((IResource) body).getInputStream();
-            try {
-                UndertowWebHelper.send(exchange, is);
-            } finally {
-                IoHelper.safeCloseObject(is);
-            }
-        } else if (body instanceof File) {
-            InputStream is = null;
-            try {
-                is = new FileInputStream((File) body);
-
-                UndertowWebHelper.send(exchange, is);
-            } catch (Exception e) {
-                throw NopException.adapt(e);
-            } finally {
-                IoHelper.safeClose(is);
-            }
-        } else if (body instanceof byte[]) {
-            UndertowWebHelper.send(exchange, (byte[]) body);
-        } else if (body instanceof InputStream) {
-            UndertowWebHelper.send(exchange, (InputStream) body);
-        } else if (body instanceof String) {
-            UndertowWebHelper.send(exchange, (String) body);
-        }
-
-        return null;
+        return consumeWebContent(response, contentBean, (headers, body, status) -> {
+            UndertowWebHelper.send(exchange, headers, body, status);
+            return null;
+        });
     }
 }
