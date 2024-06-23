@@ -2,3 +2,17 @@ server:
   port: 8050
   http.gzip.enable: true
 
+solon.logging.appender:
+  console:
+    level: DEBUG #可根据需要调整级别
+    enable: true #是否启用
+  cloud:
+    level: INFO
+    enable: true
+
+# 记录器级别的配置示例
+solon.logging.logger:
+  "root": #默认记录器配置
+    level: DEBUG
+  "com.zaxxer.hikari":
+    level: WARN

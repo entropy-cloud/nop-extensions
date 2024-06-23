@@ -28,7 +28,7 @@ public class MyRuntimeNativeRegistrar implements RuntimeNativeRegistrar {
         metadata.registerResourceInclude("_vfs/.*");
         metadata.registerResourceInclude("application.yaml");
         metadata.registerResourceInclude("bootstrap.yaml");
-
+        metadata.registerResourceInclude("logback.xml");
     }
 
 }
