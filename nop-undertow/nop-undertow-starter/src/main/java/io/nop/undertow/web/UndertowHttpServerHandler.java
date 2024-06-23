@@ -31,12 +31,12 @@ import io.undertow.util.Headers;
  * @date 2024-05-06
  */
 public class UndertowHttpServerHandler implements HttpHandler {
-    private final HttpHandler next;
+    private final HttpHandler handler;
 
     private List<IHttpServerFilter> filters;
 
     public UndertowHttpServerHandler() {
-        this.next = createNext();
+        this.handler = createHandler();
     }
 
     @Override
@@ -70,10 +70,10 @@ public class UndertowHttpServerHandler implements HttpHandler {
     }
 
     protected void next(HttpServerExchange exchange) throws Exception {
-        this.next.handleRequest(exchange);
+        this.handler.handleRequest(exchange);
     }
 
-    private HttpHandler createNext() {
+    private HttpHandler createHandler() {
         ResourceManager resourceManager = new ClassPathResourceManager(getClass().getClassLoader(),
                                                                        "META-INF/resources");
         // 对包含预压缩的资源（.gz 后缀），则优先返回其对应的压缩文件
