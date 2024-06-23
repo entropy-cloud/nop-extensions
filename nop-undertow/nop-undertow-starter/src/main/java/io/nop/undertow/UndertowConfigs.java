@@ -20,10 +20,10 @@ public interface UndertowConfigs {
     SourceLocation s_loc = SourceLocation.fromClass(UndertowConfigs.class);
 
     @Description("Undertow服务监听的IP地址，默认为127.0.0.1")
-    IConfigReference<String> CFG_SERVER_ADDRESS = varRef(s_loc,
-                                                         "nop.extension.undertow.server.address",
-                                                         String.class,
-                                                         "127.0.0.1");
+    IConfigReference<String> CFG_SERVER_HOST = varRef(s_loc,
+                                                      "nop.extension.undertow.server.host",
+                                                      String.class,
+                                                      "127.0.0.1");
     @Description("Undertow服务监听的端口号，默认为8080")
     IConfigReference<Integer> CFG_SERVER_PORT = varRef(s_loc,
                                                        "nop.extension.undertow.server.port",

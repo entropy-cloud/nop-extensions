@@ -17,7 +17,7 @@ public abstract class UndertowServer {
             // https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#the-builder-api
             Undertow server = Undertow.builder()
                                       .addHttpListener(UndertowConfigs.CFG_SERVER_PORT.get(),
-                                                       UndertowConfigs.CFG_SERVER_ADDRESS.get())
+                                                       UndertowConfigs.CFG_SERVER_HOST.get())
                                       .setHandler(new UndertowHttpServerHandler())
                                       .build();
             server.start();
