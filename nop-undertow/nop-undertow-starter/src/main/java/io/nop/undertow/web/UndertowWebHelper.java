@@ -12,10 +12,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import io.nop.api.core.convert.ConvertHelper;
 import io.nop.api.core.exceptions.NopException;
+import io.nop.api.core.util.FutureHelper;
 import io.nop.commons.util.IoHelper;
 import io.nop.commons.util.StringHelper;
 import io.nop.core.resource.IResource;
@@ -58,14 +60,19 @@ public class UndertowWebHelper {
         return headers;
     }
 
-    public static void consumeRequestBody(HttpServerExchange exchange, Consumer<String> consumer) {
+    public static <T> T consumeRequestBody(HttpServerExchange exchange, Function<String, T> consumer) {
         String method = exchange.getRequestMethod().toString();
 
         if ("GET".equalsIgnoreCase(method)) {
-            consumer.accept(null);
+            return consumer.apply(null);
         } else {
-            exchange.getRequestReceiver()
-                    .receiveFullString((ex, body) -> consumer.accept(body), StandardCharsets.UTF_8);
+            CompletableFuture<T> future = new CompletableFuture<>();
+
+            exchange.getRequestReceiver().receiveFullString((ex, body) -> {
+                future.complete(consumer.apply(body));
+            }, StandardCharsets.UTF_8);
+
+            return FutureHelper.getFromFuture(future);
         }
     }
 

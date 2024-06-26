@@ -1,11 +1,13 @@
 package io.nop.undertow.service;
 
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.nop.api.core.beans.ApiResponse;
 import io.nop.api.core.beans.WebContentBean;
+import io.nop.api.core.util.FutureHelper;
 import io.nop.graphql.core.IGraphQLExecutionContext;
 import io.nop.graphql.core.ast.GraphQLOperationType;
 import io.nop.graphql.core.web.GraphQLWebService;
@@ -52,62 +54,72 @@ public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHan
             String method = exchange.getRequestMethod().toString();
 
             if ("/graphql".equals(path) && "POST".equalsIgnoreCase(method)) {
-                handleGraphQL(exchange);
-                return;
+                return handleGraphQL(exchange);
             }
 
             Matcher matcher = REST_URL_MATCHER.matcher(path);
             if (matcher.matches()) {
                 String operationName = matcher.group(1);
-                handleRest(exchange, operationName);
-                return;
+
+                return handleRest(exchange, operationName);
             }
 
             matcher = PAGE_QUERY_URL_MATCHER.matcher(path);
             if (matcher.matches()) {
                 String query = matcher.group(1);
-                handlePageQuery(exchange, method, query);
-                return;
+
+                return handlePageQuery(exchange, method, query);
             }
 
             this.next.handleRequest(exchange);
+
+            return FutureHelper.success(null);
         });
     }
 
-    protected void handleGraphQL(HttpServerExchange exchange) {
-        UndertowWebHelper.consumeRequestBody(exchange, (body) -> runGraphQL(body, this::outputJson));
+    protected CompletionStage<Void> handleGraphQL(HttpServerExchange exchange) {
+        return UndertowWebHelper.consumeRequestBody(exchange, (body) -> {
+            //
+            return runGraphQL(body, (headers, data, status) -> outputJson(exchange, headers, data, status));
+        });
     }
 
-    protected void handleRest(HttpServerExchange exchange, String operationName) {
+    protected CompletionStage<Void> handleRest(HttpServerExchange exchange, String operationName) {
         String selection = UndertowWebHelper.getQueryParam(exchange, SYS_PARAM_SELECTION);
 
-        UndertowWebHelper.consumeRequestBody(exchange,
-                                             (body) -> runRest(null,
-                                                               operationName,
-                                                               () -> buildRequest(body, selection, true),
-                                                               this::outputJson));
+        return UndertowWebHelper.consumeRequestBody(exchange, (body) -> {
+            //
+            return runRest(null,
+                           operationName,
+                           () -> buildRequest(body, selection, true),
+                           (headers, data, status) -> outputJson(exchange, headers, data, status));
+        });
     }
 
-    protected void handlePageQuery(HttpServerExchange exchange, String method, String query) {
+    protected CompletionStage<Void> handlePageQuery(HttpServerExchange exchange, String method, String query) {
         String selection = UndertowWebHelper.getQueryParam(exchange, SYS_PARAM_SELECTION);
 
         if ("GET".equalsIgnoreCase(method)) {
             String args = UndertowWebHelper.getQueryParam(exchange, SYS_PARAM_ARGS);
 
-            doPageQuery(GraphQLOperationType.query, query, selection, args, this::outputPageQuery);
+            return doPageQuery(GraphQLOperationType.query, query, selection, args, (response, gqlContext) -> {
+                //
+                return outputPageQuery(exchange, response, gqlContext);
+            });
         } else {
-            UndertowWebHelper.consumeRequestBody(exchange,
-                                                 (body) -> doPageQuery(null,
-                                                                       query,
-                                                                       selection,
-                                                                       body,
-                                                                       this::outputPageQuery));
+            return UndertowWebHelper.consumeRequestBody(exchange, (body) -> {
+                //
+                return doPageQuery(null,
+                                   query,
+                                   selection,
+                                   body,
+                                   (response, gqlContext) -> outputPageQuery(exchange, response, gqlContext));
+            });
         }
     }
 
-    protected Void outputJson(Map<String, Object> headers, String body, int status) {
-        HttpServerExchange exchange = UndertowContext.getExchange();
-
+    /** Note：输出是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
+    protected Void outputJson(HttpServerExchange exchange, Map<String, Object> headers, String body, int status) {
         headers.put(Headers.CONTENT_TYPE_STRING, WebContentBean.CONTENT_TYPE_JSON);
 
         UndertowWebHelper.send(exchange, headers, body, status);
@@ -115,8 +127,10 @@ public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHan
         return null;
     }
 
-    protected Void outputPageQuery(ApiResponse<?> response, IGraphQLExecutionContext gqlContext) {
-        HttpServerExchange exchange = UndertowContext.getExchange();
+    /** Note：输出是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
+    protected Void outputPageQuery(
+            HttpServerExchange exchange, ApiResponse<?> response, IGraphQLExecutionContext gqlContext
+    ) {
         WebContentBean contentBean = buildWebContent(response);
 
         return consumeWebContent(response, contentBean, (headers, body, status) -> {

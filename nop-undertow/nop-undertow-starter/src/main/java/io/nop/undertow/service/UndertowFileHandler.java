@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,12 +41,9 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
                                                                         + "/([^/\\\\]+)$");
 
     private final HttpHandler next;
-    private final EagerFormParsingHandler formHandler;
 
     public UndertowFileHandler(HttpHandler next) {
         this.next = next;
-        // https://stackoverflow.com/questions/37839418/multipart-form-data-example-using-undertow#answer-46374193
-        this.formHandler = new EagerFormParsingHandler(this::handleUpload);
     }
 
     @Override
@@ -55,8 +53,14 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
             String method = exchange.getRequestMethod().toString();
 
             if (FileConstants.PATH_UPLOAD.equals(path) && "POST".equalsIgnoreCase(method)) {
-                this.formHandler.handleRequest(exchange);
-                return;
+                CompletableFuture<Void> promise = new CompletableFuture<>();
+
+                // https://stackoverflow.com/questions/37839418/multipart-form-data-example-using-undertow#answer-46374193
+                new EagerFormParsingHandler((ex) -> {
+                    handleUpload(ex).whenComplete((r, e) -> FutureHelper.complete(promise, r, e));
+                }).handleRequest(exchange);
+
+                return promise;
             }
 
             Matcher matcher = DOWNLOAD_URL_MATCHER.matcher(path);
@@ -64,15 +68,16 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
                 String fileId = matcher.group(1);
                 String contentType = UndertowWebHelper.getQueryParam(exchange, "contentType");
 
-                handleDownload(exchange, fileId, contentType);
-                return;
+                return handleDownload(exchange, fileId, contentType);
             }
 
             this.next.handleRequest(exchange);
+
+            return FutureHelper.success(null);
         });
     }
 
-    private void handleUpload(HttpServerExchange exchange) {
+    private CompletionStage<Void> handleUpload(HttpServerExchange exchange) {
         String locale = ContextProvider.currentLocale();
 
         CompletionStage<ApiResponse<?>> future;
@@ -99,27 +104,31 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
             future = FutureHelper.success(ErrorMessageManager.instance().buildResponse(locale, e));
         }
 
-        future.thenAccept(resp -> sendData(resp.getHttpStatus(), resp));
+        return future.thenApply(resp -> {
+            sendData(exchange, resp.getHttpStatus(), resp);
+            return null;
+        });
     }
 
-    private void handleDownload(HttpServerExchange exchange, String fileId, String contentType) {
+    private CompletionStage<Void> handleDownload(HttpServerExchange exchange, String fileId, String contentType) {
         DownloadRequestBean req = new DownloadRequestBean();
         req.setFileId(fileId);
         req.setContentType(contentType);
 
         CompletionStage<ApiResponse<WebContentBean>> future = downloadAsync(buildApiRequest(exchange, req));
 
-        future.thenAccept(resp -> {
+        return future.thenApply(resp -> {
             if (!resp.isOk()) {
                 int status = resp.getHttpStatus();
                 if (status == 0) {
                     status = 500;
                 }
 
-                sendData(status, resp);
+                sendData(exchange, status, resp);
             } else {
-                sendData(resp.getHttpStatus(), resp.getData());
+                sendData(exchange, resp.getHttpStatus(), resp.getData());
             }
+            return null;
         });
     }
 
@@ -139,9 +148,8 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
         return request;
     }
 
-    public void sendData(int status, Object data) {
-        HttpServerExchange exchange = UndertowContext.getExchange();
-
+    /** Note：输出可能是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
+    public void sendData(HttpServerExchange exchange, int status, Object data) {
         if (status == 0) {
             status = 200;
         }
