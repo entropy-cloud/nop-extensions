@@ -3,16 +3,18 @@ package io.nop.undertow.web;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
-import io.nop.api.core.exceptions.NopException;
 import io.nop.api.core.ioc.BeanContainer;
-import io.nop.api.core.util.FutureHelper;
 import io.nop.api.core.util.OrderedComparator;
 import io.nop.commons.util.ClassHelper;
 import io.nop.http.api.server.HttpServerHelper;
 import io.nop.http.api.server.IHttpServerContext;
 import io.nop.http.api.server.IHttpServerFilter;
 import io.nop.undertow.UndertowConfigs;
+import io.nop.undertow.handler.FutureHttpHandler;
+import io.nop.undertow.handler.FutureHttpHandlerHelper;
+import io.nop.undertow.service.UndertowContext;
 import io.nop.undertow.service.UndertowFileHandler;
 import io.nop.undertow.service.UndertowGraphQLHandler;
 import io.undertow.server.HttpHandler;
@@ -29,6 +31,9 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 
 /**
+ * Undertow 服务请求的主处理器，由其调用 {@link IHttpServerFilter}、{@link UndertowGraphQLHandler}
+ * 和 {@link UndertowFileHandler}
+ *
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2024-05-06
  */
@@ -50,16 +55,7 @@ public class UndertowHttpServerHandler implements HttpHandler {
         } else {
             IHttpServerContext ctx = new UndertowHttpServerContext(exchange);
 
-            HttpServerHelper.runWithFilters(serverFilters, ctx, () -> FutureHelper.futureCall(() -> {
-                try {
-                    next(exchange);
-                    return null;
-                } catch (Error e) {
-                    throw e;
-                } catch (Throwable e) {
-                    throw NopException.adapt(e);
-                }
-            }));
+            HttpServerHelper.runWithFilters(serverFilters, ctx, () -> next(exchange));
         }
     }
 
@@ -71,8 +67,13 @@ public class UndertowHttpServerHandler implements HttpHandler {
         return this.filters;
     }
 
-    protected void next(HttpServerExchange exchange) throws Exception {
-        this.handler.handleRequest(exchange);
+    /**
+     * 在当前线程及其子线程内的 {@link HttpHandler} 均可通过
+     * {@link UndertowContext#getExchange()} 获取到 {@link HttpServerExchange}
+     */
+    protected CompletionStage<Void> next(HttpServerExchange exchange) {
+        return UndertowContext.withExchange(exchange,
+                                            () -> FutureHttpHandlerHelper.handleRequest(this.handler, exchange));
     }
 
     private HttpHandler createHandler() {
@@ -87,7 +88,7 @@ public class UndertowHttpServerHandler implements HttpHandler {
         // 从而导致在 Nop ContextProvider 中与当前线程绑定的变量无法在
         // ResourceHandler 的后继中获取到，因此，必须先在当前线程中执行
         // UndertowGraphQLHandler，再将未处理的请求交给 ResourceHandler
-        HttpHandler handler = new UndertowGraphQLHandler(resourceHandler);
+        FutureHttpHandler handler = new UndertowGraphQLHandler(resourceHandler);
 
         // 若运行环境引入了 nop-file，则启用文件上传和下载支持。
         // Note: Undertow 没有扫描和自动注册机制，只能通过环境中是否存在特定的 class
@@ -115,7 +116,7 @@ public class UndertowHttpServerHandler implements HttpHandler {
                        && contentType != null && mimeTypes.contains(contentType);
             });
 
-            handler = new EncodingHandler(handler, encodingRepository);
+            handler = FutureHttpHandlerHelper.withFuture((h) -> new EncodingHandler(h, encodingRepository), handler);
         }
 
         return handler;

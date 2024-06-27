@@ -24,6 +24,8 @@ import io.nop.file.core.DownloadRequestBean;
 import io.nop.file.core.FileConstants;
 import io.nop.file.core.MediaTypeHelper;
 import io.nop.file.core.UploadRequestBean;
+import io.nop.undertow.handler.FutureHttpHandler;
+import io.nop.undertow.handler.FutureHttpHandlerHelper;
 import io.nop.undertow.web.UndertowWebHelper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -35,7 +37,7 @@ import io.undertow.util.Headers;
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2024-06-23
  */
-public class UndertowFileHandler extends AbstractGraphQLFileService implements HttpHandler {
+public class UndertowFileHandler extends AbstractGraphQLFileService implements FutureHttpHandler {
     private final static Pattern DOWNLOAD_URL_MATCHER = Pattern.compile("^"
                                                                         + FileConstants.PATH_DOWNLOAD
                                                                         + "/([^/\\\\]+)$");
@@ -47,37 +49,41 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        UndertowContext.withExchange(exchange, () -> {
-            String path = exchange.getRequestPath();
-            String method = exchange.getRequestMethod().toString();
+    public CompletionStage<Void> handleRequestAsync(HttpServerExchange exchange) {
+        String path = exchange.getRequestPath();
+        String method = exchange.getRequestMethod().toString();
 
-            if (FileConstants.PATH_UPLOAD.equals(path) && "POST".equalsIgnoreCase(method)) {
-                CompletableFuture<Void> promise = new CompletableFuture<>();
+        if (FileConstants.PATH_UPLOAD.equals(path) && "POST".equalsIgnoreCase(method)) {
+            return handleUpload(exchange);
+        }
 
-                // https://stackoverflow.com/questions/37839418/multipart-form-data-example-using-undertow#answer-46374193
-                new EagerFormParsingHandler((ex) -> {
-                    handleUpload(ex).whenComplete((r, e) -> FutureHelper.complete(promise, r, e));
-                }).handleRequest(exchange);
+        Matcher matcher = DOWNLOAD_URL_MATCHER.matcher(path);
+        if (matcher.matches()) {
+            String fileId = matcher.group(1);
+            String contentType = UndertowWebHelper.getQueryParam(exchange, "contentType");
 
-                return promise;
-            }
+            return handleDownload(exchange, fileId, contentType);
+        }
 
-            Matcher matcher = DOWNLOAD_URL_MATCHER.matcher(path);
-            if (matcher.matches()) {
-                String fileId = matcher.group(1);
-                String contentType = UndertowWebHelper.getQueryParam(exchange, "contentType");
-
-                return handleDownload(exchange, fileId, contentType);
-            }
-
-            this.next.handleRequest(exchange);
-
-            return FutureHelper.success(null);
-        });
+        return FutureHttpHandlerHelper.handleRequest(this.next, exchange);
     }
 
     private CompletionStage<Void> handleUpload(HttpServerExchange exchange) {
+        try {
+            CompletableFuture<Void> promise = new CompletableFuture<>();
+
+            // https://stackoverflow.com/questions/37839418/multipart-form-data-example-using-undertow#answer-46374193
+            new EagerFormParsingHandler((ex) -> {
+                doHandleUpload(ex).whenComplete((r, e) -> FutureHelper.complete(promise, r, e));
+            }).handleRequest(exchange);
+
+            return promise;
+        } catch (Exception e) {
+            return FutureHelper.reject(e);
+        }
+    }
+
+    private CompletionStage<Void> doHandleUpload(HttpServerExchange exchange) {
         String locale = ContextProvider.currentLocale();
 
         CompletionStage<ApiResponse<?>> future;
@@ -104,10 +110,7 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
             future = FutureHelper.success(ErrorMessageManager.instance().buildResponse(locale, e));
         }
 
-        return future.thenApply(resp -> {
-            sendData(exchange, resp.getHttpStatus(), resp);
-            return null;
-        });
+        return future.thenApply(resp -> sendData(exchange, resp.getHttpStatus(), resp));
     }
 
     private CompletionStage<Void> handleDownload(HttpServerExchange exchange, String fileId, String contentType) {
@@ -124,11 +127,10 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
                     status = 500;
                 }
 
-                sendData(exchange, status, resp);
+                return sendData(exchange, status, resp);
             } else {
-                sendData(exchange, resp.getHttpStatus(), resp.getData());
+                return sendData(exchange, resp.getHttpStatus(), resp.getData());
             }
-            return null;
         });
     }
 
@@ -149,7 +151,7 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
     }
 
     /** Note：输出可能是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
-    public void sendData(HttpServerExchange exchange, int status, Object data) {
+    public Void sendData(HttpServerExchange exchange, int status, Object data) {
         if (status == 0) {
             status = 200;
         }
@@ -173,5 +175,7 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements H
         }
 
         UndertowWebHelper.send(exchange, headers, body, status);
+
+        return null;
     }
 }

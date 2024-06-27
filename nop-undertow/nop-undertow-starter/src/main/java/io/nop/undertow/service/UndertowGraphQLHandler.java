@@ -7,10 +7,11 @@ import java.util.regex.Pattern;
 
 import io.nop.api.core.beans.ApiResponse;
 import io.nop.api.core.beans.WebContentBean;
-import io.nop.api.core.util.FutureHelper;
 import io.nop.graphql.core.IGraphQLExecutionContext;
 import io.nop.graphql.core.ast.GraphQLOperationType;
 import io.nop.graphql.core.web.GraphQLWebService;
+import io.nop.undertow.handler.FutureHttpHandler;
+import io.nop.undertow.handler.FutureHttpHandlerHelper;
 import io.nop.undertow.web.UndertowWebHelper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -23,7 +24,7 @@ import static io.nop.graphql.core.GraphQLConstants.SYS_PARAM_SELECTION;
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
  * @date 2024-05-06
  */
-public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHandler {
+public class UndertowGraphQLHandler extends GraphQLWebService implements FutureHttpHandler {
     private final static Pattern REST_URL_MATCHER = Pattern.compile("^/r/([^/\\\\]+)$");
     private final static Pattern PAGE_QUERY_URL_MATCHER = Pattern.compile("^/p/(.+)$");
 
@@ -35,6 +36,7 @@ public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHan
 
     @Override
     protected Map<String, String> getParams() {
+        // Note：该接口会在异步创建前被调用，所以，可以直接获取线程变量
         HttpServerExchange exchange = UndertowContext.getExchange();
 
         return UndertowWebHelper.getQueryParams(exchange);
@@ -42,39 +44,36 @@ public class UndertowGraphQLHandler extends GraphQLWebService implements HttpHan
 
     @Override
     protected Map<String, Object> getHeaders() {
+        // Note：该接口会在异步创建前被调用，所以，可以直接获取线程变量
         HttpServerExchange exchange = UndertowContext.getExchange();
 
         return UndertowWebHelper.getRequestHeaders(exchange);
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        UndertowContext.withExchange(exchange, () -> {
-            String path = exchange.getRequestPath();
-            String method = exchange.getRequestMethod().toString();
+    public CompletionStage<Void> handleRequestAsync(HttpServerExchange exchange) {
+        String path = exchange.getRequestPath();
+        String method = exchange.getRequestMethod().toString();
 
-            if ("/graphql".equals(path) && "POST".equalsIgnoreCase(method)) {
-                return handleGraphQL(exchange);
-            }
+        if ("/graphql".equals(path) && "POST".equalsIgnoreCase(method)) {
+            return handleGraphQL(exchange);
+        }
 
-            Matcher matcher = REST_URL_MATCHER.matcher(path);
-            if (matcher.matches()) {
-                String operationName = matcher.group(1);
+        Matcher matcher = REST_URL_MATCHER.matcher(path);
+        if (matcher.matches()) {
+            String operationName = matcher.group(1);
 
-                return handleRest(exchange, operationName);
-            }
+            return handleRest(exchange, operationName);
+        }
 
-            matcher = PAGE_QUERY_URL_MATCHER.matcher(path);
-            if (matcher.matches()) {
-                String query = matcher.group(1);
+        matcher = PAGE_QUERY_URL_MATCHER.matcher(path);
+        if (matcher.matches()) {
+            String query = matcher.group(1);
 
-                return handlePageQuery(exchange, method, query);
-            }
+            return handlePageQuery(exchange, method, query);
+        }
 
-            this.next.handleRequest(exchange);
-
-            return FutureHelper.success(null);
-        });
+        return FutureHttpHandlerHelper.handleRequest(this.next, exchange);
     }
 
     protected CompletionStage<Void> handleGraphQL(HttpServerExchange exchange) {
