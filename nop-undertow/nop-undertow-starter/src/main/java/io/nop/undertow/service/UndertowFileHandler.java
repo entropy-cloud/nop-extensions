@@ -3,14 +3,12 @@ package io.nop.undertow.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.nop.api.core.ApiConstants;
 import io.nop.api.core.beans.ApiRequest;
 import io.nop.api.core.beans.ApiResponse;
 import io.nop.api.core.beans.WebContentBean;
@@ -18,12 +16,11 @@ import io.nop.api.core.context.ContextProvider;
 import io.nop.api.core.util.FutureHelper;
 import io.nop.commons.util.StringHelper;
 import io.nop.core.exceptions.ErrorMessageManager;
-import io.nop.core.lang.json.JsonTool;
 import io.nop.file.core.AbstractGraphQLFileService;
 import io.nop.file.core.DownloadRequestBean;
 import io.nop.file.core.FileConstants;
-import io.nop.file.core.MediaTypeHelper;
 import io.nop.file.core.UploadRequestBean;
+import io.nop.graphql.core.utils.GraphQLResponseHelper;
 import io.nop.undertow.handler.FutureHttpHandler;
 import io.nop.undertow.handler.FutureHttpHandlerHelper;
 import io.nop.undertow.web.UndertowWebHelper;
@@ -95,14 +92,9 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements F
 
                 InputStream is = formFile.getFileItem().getInputStream();
                 String fileName = StringHelper.fileFullName(formFile.getFileName());
-                String mimeType = MediaTypeHelper.getMimeType(contentType, StringHelper.fileExt(fileName));
+                long fileSize = formFile.getFileItem().getFileSize();
 
-                UploadRequestBean req = new UploadRequestBean(is,
-                                                              fileName,
-                                                              formFile.getFileItem().getFileSize(),
-                                                              mimeType);
-                req.setBizObjName(params.get(FileConstants.PARAM_BIZ_OBJ_NAME));
-                req.setFieldName(params.get(FileConstants.PARAM_FIELD_NAME));
+                UploadRequestBean req = buildUploadRequestBean(is, fileName, fileSize, contentType, params::get);
 
                 return uploadAsync(buildApiRequest(exchange, req));
             });
@@ -110,72 +102,51 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements F
             future = FutureHelper.success(ErrorMessageManager.instance().buildResponse(locale, e));
         }
 
-        return future.thenApply(resp -> sendData(exchange, resp.getHttpStatus(), resp));
+        return future.thenApply(resp -> sendJsonData(exchange, resp));
     }
 
     private CompletionStage<Void> handleDownload(HttpServerExchange exchange, String fileId, String contentType) {
-        DownloadRequestBean req = new DownloadRequestBean();
-        req.setFileId(fileId);
-        req.setContentType(contentType);
+        DownloadRequestBean req = buildDownloadRequestBean(fileId, contentType);
 
-        CompletionStage<ApiResponse<WebContentBean>> future = downloadAsync(buildApiRequest(exchange, req));
-
-        return future.thenApply(resp -> {
-            if (!resp.isOk()) {
-                int status = resp.getHttpStatus();
-                if (status == 0) {
-                    status = 500;
-                }
-
-                return sendData(exchange, status, resp);
+        return downloadAsync(buildApiRequest(exchange, req)).thenApply(res -> {
+            if (!res.isOk()) {
+                return sendJsonData(exchange, res);
             } else {
-                return sendData(exchange, resp.getHttpStatus(), resp.getData());
+                return sendFileData(exchange, res);
             }
         });
     }
 
     protected <T> ApiRequest<T> buildApiRequest(HttpServerExchange exchange, T data) {
-        ApiRequest<T> request = new ApiRequest<>();
-        request.setData(data);
-
-        exchange.getRequestHeaders().forEach(header -> {
-            String name = header.getHeaderName().toString().toLowerCase(Locale.ENGLISH);
-            if (shouldIgnoreHeader(name)) {
-                return;
-            }
-
-            request.setHeader(name, header.getFirst());
+        return buildApiRequest(data, (header) -> {
+            exchange.getRequestHeaders().forEach(h -> {
+                String name = h.getHeaderName().toString();
+                header.accept(name, h.getFirst());
+            });
         });
-
-        return request;
     }
 
     /** Note：输出可能是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
-    public Void sendData(HttpServerExchange exchange, int status, Object data) {
-        if (status == 0) {
-            status = 200;
-        }
+    public Void sendJsonData(HttpServerExchange exchange, ApiResponse<?> response) {
+        return GraphQLResponseHelper.consumeJsonResponse(response, (invokeHeaderSet, body, status) -> {
+            Map<String, Object> headers = new HashMap<>();
+            invokeHeaderSet.accept(headers::put);
 
-        Map<String, Object> headers = new HashMap<>();
+            UndertowWebHelper.send(exchange, headers, body, status);
 
-        Object body;
-        if (data instanceof WebContentBean) {
-            WebContentBean contentBean = (WebContentBean) data;
+            return null;
+        });
+    }
 
-            headers.put(ApiConstants.HEADER_CONTENT_TYPE, contentBean.getContentType());
+    /** Note：输出可能是异步的，需直接传递 exchange 以避免在先线程中无法通过 {@link UndertowContext#getExchange()} 获取的问题 */
+    public Void sendFileData(HttpServerExchange exchange, ApiResponse<WebContentBean> response) {
+        return GraphQLResponseHelper.consumeWebContent(response, (invokeHeaderSet, content, status) -> {
+            Map<String, Object> headers = new HashMap<>();
+            invokeHeaderSet.accept(headers::put);
 
-            if (!StringHelper.isEmpty(contentBean.getFileName())) {
-                String encoded = StringHelper.encodeURL(contentBean.getFileName());
-                headers.put("Content-Disposition", "attachment; filename=" + encoded);
-            }
+            UndertowWebHelper.send(exchange, headers, content, status);
 
-            body = contentBean.getContent();
-        } else {
-            body = JsonTool.stringify(data);
-        }
-
-        UndertowWebHelper.send(exchange, headers, body, status);
-
-        return null;
+            return null;
+        });
     }
 }
