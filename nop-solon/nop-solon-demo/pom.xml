@@ -12,6 +12,11 @@
 
     <artifactId>nop-solon-demo</artifactId>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
+
     <dependencies>
         <!-- 般在主模块里引入 http-server 相关组件（方便切换选择不同的方案） -->
         <dependency>
