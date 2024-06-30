@@ -133,8 +133,66 @@ Nop 运行环境，并根据应用配置创建和启动 Undertow 服务。
         <artifactId>maven-shade-plugin</artifactId>
       </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <!-- 可执行 jar 打包: https://maven.apache.org/plugins/maven-shade-plugin/examples/executable-jar.html -->
+        <!--
+        注意，该插件会把依赖全部解包并合并放在可执行的 jar 中，
+        即 uberjar 打包模式，其比 Spring boot 的 nested-jars 打包模式的加载速度会更快一点，
+        但是，同名类和资源文件会出现被覆盖的问题，因此，需尽量避免同名文件，
+        或者通过该插件的 transformer 对同名文件做合并（https://juejin.cn/post/7065862239349112863）。
+        在依赖较复杂，且可能存在多版本时，可以尝试采用插件 spring-boot-maven-plugin
+        以 nested-jars 模式打包
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.1.1</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <finalName>${project.build.finalName}-exec</finalName>
+                <transformers>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <mainClass>io.nop.undertow.UndertowStarter</mainClass>
+                  </transformer>
+                  <!--
+                  META-INF/services/ 中会存在同名文件，需将其内容合并，以确保
+                  Nop IocCoreInitializer 等能够被 ServiceLoader 加载:
+                  https://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#ServicesResourceTransformer
+                  -->
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                </transformers>
+                <!--
+                修复运行 jar 时出现 "java.lang.SecurityException: Invalid signature file digest for Manifest main attributes" 异常的问题:
+                https://stackoverflow.com/questions/34855649/invalid-signature-file-digest-for-manifest-main-attributes-exception-while-tryin#answer-64263739
+                -->
+                <filters>
+                  <filter>
+                    <artifact>*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/*.SF</exclude>
+                      <exclude>META-INF/*.DSA</exclude>
+                      <exclude>META-INF/*.RSA</exclude>
+                    </excludes>
+                  </filter>
+                </filters>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 ```
+
+> 若是应用的启动器包含其他处理逻辑，则需要将 `<mainClass>io.nop.undertow.UndertowStarter</mainClass>`
+> 中的 `io.nop.undertow.UndertowStarter` 修改为自己的启动器 class。
 
 然后，通过 Maven 打包项目：
 
