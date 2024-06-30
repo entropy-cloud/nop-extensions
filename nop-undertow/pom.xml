@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.entropy-cloud</groupId>
+        <artifactId>nop-extensions</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>io.github.entropy-cloud.extensions</groupId>
+    <artifactId>nop-undertow</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <undertow.version>2.3.13.Final</undertow.version>
+    </properties>
+
+    <modules>
+        <module>nop-undertow-starter</module>
+
+        <module>nop-undertow-demo</module>
+        <module>nop-undertow-service-demo</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.github.entropy-cloud.extensions</groupId>
+                <artifactId>nop-undertow-starter</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+
+            <!-- 文档: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html -->
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-core</artifactId>
+                <version>${undertow.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- 可执行 jar 打包: https://maven.apache.org/plugins/maven-shade-plugin/examples/executable-jar.html -->
+                <!--
+                注意，该插件会把依赖全部解包并合并放在可执行的 jar 中，
+                即 uberjar 打包模式，其比 Spring boot 的 nested-jars 打包模式的加载速度会更快一点，
+                但是，同名类和资源文件会出现被覆盖的问题，因此，需尽量避免同名文件，
+                或者通过该插件的 transformer 对同名文件做合并（https://juejin.cn/post/7065862239349112863）。
+                在依赖较复杂，且可能存在多版本时，可以尝试采用插件 spring-boot-maven-plugin
+                以 nested-jars 模式打包
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                            <configuration>
+                                <finalName>${project.build.finalName}-exec</finalName>
+                                <transformers>
+                                    <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <mainClass>io.nop.undertow.UndertowStarter</mainClass>
+                                    </transformer>
+                                    <!--
+                                    META-INF/services/ 中会存在同名文件，需将其内容合并，以确保
+                                    Nop IocCoreInitializer 等能够被 ServiceLoader 加载:
+                                    https://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html#ServicesResourceTransformer
+                                    -->
+                                    <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                </transformers>
+                                <!--
+                                修复运行 jar 时出现 "java.lang.SecurityException: Invalid signature file digest for Manifest main attributes" 异常的问题:
+                                https://stackoverflow.com/questions/34855649/invalid-signature-file-digest-for-manifest-main-attributes-exception-while-tryin#answer-64263739
+                                -->
+                                <filters>
+                                    <filter>
+                                        <artifact>*:*</artifact>
+                                        <excludes>
+                                            <exclude>META-INF/*.SF</exclude>
+                                            <exclude>META-INF/*.DSA</exclude>
+                                            <exclude>META-INF/*.RSA</exclude>
+                                        </excludes>
+                                    </filter>
+                                </filters>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

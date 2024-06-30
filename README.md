@@ -12,3 +12,7 @@ nop-ofbiz提供从ofbiz的XML模型向Nop平台模型的自动转换。
 ### nop-solon
 
 Nop平台集成solon框架，使用solon的HttpServer来运行
+
+### nop-undertow
+
+Nop平台集成undertow框架，使用undertow来运行Web应用服务。详细说明见[集成指南](./nop-undertow/README.md)。

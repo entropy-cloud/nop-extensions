@@ -19,6 +19,7 @@
 
     <modules>
         <module>nop-solon</module>
+        <module>nop-undertow</module>
         <module>nop-demo</module>
     </modules>
 
