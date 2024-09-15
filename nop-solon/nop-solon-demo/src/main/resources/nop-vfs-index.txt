@@ -274,6 +274,7 @@
 /nop/codegen/xlib/web-gen.xlib
 /nop/core/_module
 /nop/core/app.module.yaml
+/nop/core/model/DictProvider/DictProvider.xbiz
 /nop/core/registry/api.register-model.xml
 /nop/core/registry/dao-rule.register-model.xml
 /nop/core/registry/dao-wf.register-model.xml
@@ -301,6 +302,7 @@
 /nop/core/xlib/file.xlib
 /nop/core/xlib/filter.xlib
 /nop/core/xlib/meta-gen.xlib
+/nop/core/xlib/meta-prop.xlib
 /nop/dao/beans/dao-defaults.beans.xml
 /nop/dao/dialect/db2.dialect.xml
 /nop/dao/dialect/default.dialect.xml
@@ -395,6 +397,12 @@
 /nop/dyn/model/NopDynPage/NopDynPage.xmeta
 /nop/dyn/model/NopDynPage/_NopDynPage.xbiz
 /nop/dyn/model/NopDynPage/_NopDynPage.xmeta
+/nop/dyn/model/NopDynPatch/NopDynPatch.xbiz
+/nop/dyn/model/NopDynPatch/_NopDynPatch.xbiz
+/nop/dyn/model/NopDynPatchFile/NopDynPatchFile.xbiz
+/nop/dyn/model/NopDynPatchFile/NopDynPatchFile.xmeta
+/nop/dyn/model/NopDynPatchFile/_NopDynPatchFile.xbiz
+/nop/dyn/model/NopDynPatchFile/_NopDynPatchFile.xmeta
 /nop/dyn/model/NopDynPropMeta/NopDynPropMeta.xbiz
 /nop/dyn/model/NopDynPropMeta/NopDynPropMeta.xmeta
 /nop/dyn/model/NopDynPropMeta/_NopDynPropMeta.xbiz
@@ -465,6 +473,11 @@
 /nop/dyn/pages/NopDynPage/main.page.yaml
 /nop/dyn/pages/NopDynPage/picker.page.yaml
 /nop/dyn/pages/NopDynPage/ref-module.page.yaml
+/nop/dyn/pages/NopDynPatchFile/NopDynPatchFile.lib.xjs
+/nop/dyn/pages/NopDynPatchFile/NopDynPatchFile.view.xml
+/nop/dyn/pages/NopDynPatchFile/_gen/_NopDynPatchFile.view.xml
+/nop/dyn/pages/NopDynPatchFile/main.page.yaml
+/nop/dyn/pages/NopDynPatchFile/picker.page.yaml
 /nop/dyn/pages/NopDynPropMeta/NopDynPropMeta.lib.xjs
 /nop/dyn/pages/NopDynPropMeta/NopDynPropMeta.view.xml
 /nop/dyn/pages/NopDynPropMeta/_gen/_NopDynPropMeta.view.xml
@@ -640,6 +653,10 @@
 /nop/schema/conf.xdef
 /nop/schema/data-auth.xdef
 /nop/schema/datav/chart.xdef
+/nop/schema/db/export-db.xdef
+/nop/schema/db/import-db.xdef
+/nop/schema/db/jdbc-connection.xdef
+/nop/schema/db/table-field.xdef
 /nop/schema/designer/graph-designer.xdef
 /nop/schema/errors.xdef
 /nop/schema/excel/anchor.xdef
@@ -654,6 +671,7 @@
 /nop/schema/orm/orm-interceptor.xdef
 /nop/schema/orm/orm.xdef
 /nop/schema/orm/sql-lib.xdef
+/nop/schema/orm/view-entity.xdef
 /nop/schema/query/filter.xdef
 /nop/schema/query/group-by.xdef
 /nop/schema/query/order-by.xdef
@@ -707,6 +725,10 @@
 /nop/sys/beans/_service.beans.xml
 /nop/sys/beans/app-dao.beans.xml
 /nop/sys/beans/app-service.beans.xml
+/nop/sys/model/NopSysCheckerRecord/NopSysCheckerRecord.xbiz
+/nop/sys/model/NopSysCheckerRecord/NopSysCheckerRecord.xmeta
+/nop/sys/model/NopSysCheckerRecord/_NopSysCheckerRecord.xbiz
+/nop/sys/model/NopSysCheckerRecord/_NopSysCheckerRecord.xmeta
 /nop/sys/model/NopSysClusterLeader/NopSysClusterLeader.xbiz
 /nop/sys/model/NopSysClusterLeader/NopSysClusterLeader.xmeta
 /nop/sys/model/NopSysClusterLeader/_NopSysClusterLeader.xbiz
@@ -735,10 +757,6 @@
 /nop/sys/model/NopSysLock/NopSysLock.xmeta
 /nop/sys/model/NopSysLock/_NopSysLock.xbiz
 /nop/sys/model/NopSysLock/_NopSysLock.xmeta
-/nop/sys/model/NopSysMakerCheckerRecord/NopSysMakerCheckerRecord.xbiz
-/nop/sys/model/NopSysMakerCheckerRecord/NopSysMakerCheckerRecord.xmeta
-/nop/sys/model/NopSysMakerCheckerRecord/_NopSysMakerCheckerRecord.xbiz
-/nop/sys/model/NopSysMakerCheckerRecord/_NopSysMakerCheckerRecord.xmeta
 /nop/sys/model/NopSysNoticeTemplate/NopSysNoticeTemplate.xbiz
 /nop/sys/model/NopSysNoticeTemplate/NopSysNoticeTemplate.xmeta
 /nop/sys/model/NopSysNoticeTemplate/_NopSysNoticeTemplate.xbiz
@@ -757,6 +775,11 @@
 /nop/sys/model/NopSysVariable/_NopSysVariable.xmeta
 /nop/sys/orm/_app.orm.xml
 /nop/sys/orm/app.orm.xml
+/nop/sys/pages/NopSysCheckerRecord/NopSysCheckerRecord.lib.xjs
+/nop/sys/pages/NopSysCheckerRecord/NopSysCheckerRecord.view.xml
+/nop/sys/pages/NopSysCheckerRecord/_gen/_NopSysCheckerRecord.view.xml
+/nop/sys/pages/NopSysCheckerRecord/main.page.yaml
+/nop/sys/pages/NopSysCheckerRecord/picker.page.yaml
 /nop/sys/pages/NopSysClusterLeader/NopSysClusterLeader.lib.js
 /nop/sys/pages/NopSysClusterLeader/NopSysClusterLeader.lib.xjs
 /nop/sys/pages/NopSysClusterLeader/NopSysClusterLeader.view.xml
@@ -800,12 +823,6 @@
 /nop/sys/pages/NopSysLock/_gen/_NopSysLock.view.xml
 /nop/sys/pages/NopSysLock/main.page.yaml
 /nop/sys/pages/NopSysLock/picker.page.yaml
-/nop/sys/pages/NopSysMakerCheckerRecord/NopSysMakerCheckerRecord.lib.js
-/nop/sys/pages/NopSysMakerCheckerRecord/NopSysMakerCheckerRecord.lib.xjs
-/nop/sys/pages/NopSysMakerCheckerRecord/NopSysMakerCheckerRecord.view.xml
-/nop/sys/pages/NopSysMakerCheckerRecord/_gen/_NopSysMakerCheckerRecord.view.xml
-/nop/sys/pages/NopSysMakerCheckerRecord/main.page.yaml
-/nop/sys/pages/NopSysMakerCheckerRecord/picker.page.yaml
 /nop/sys/pages/NopSysNoticeTemplate/NopSysNoticeTemplate.lib.js
 /nop/sys/pages/NopSysNoticeTemplate/NopSysNoticeTemplate.lib.xjs
 /nop/sys/pages/NopSysNoticeTemplate/NopSysNoticeTemplate.view.xml
@@ -1007,6 +1024,8 @@
 /nop/wf/beans/app-service.beans.xml
 /nop/wf/beans/wf-core.beans.xml
 /nop/wf/beans/wf-dao.beans.xml
+/nop/wf/designer/demo-data.page.json
+/nop/wf/designer/designer.page.yaml
 /nop/wf/designer/dingflow.graph-designer.xml
 /nop/wf/designer/dingflow.lib.js
 /nop/wf/designer/dingflow.lib.xjs
@@ -1152,6 +1171,7 @@
 /nop/wf/xlib/beeflow.xlib
 /nop/wf/xlib/dingflow-gen.xlib
 /nop/wf/xlib/dingflow-gen/impl_GenComponents.xpl
+/nop/wf/xlib/dingflow-gen/impl_GenFlowEditorPage.xpl
 /nop/wf/xlib/dingflow-gen/impl_GenFlowEditorSchema.xpl
 /nop/wf/xlib/oa.xlib
 /nop/wf/xlib/wf-actor.xlib

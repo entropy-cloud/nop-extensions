@@ -24,7 +24,7 @@ nop:
 
   orm:
     init-database-schema: true
-    enable-tenant-by-default: true
+    enable-tenant-by-default: false
     auto-add-tenant-col: true
 
   datasource:
