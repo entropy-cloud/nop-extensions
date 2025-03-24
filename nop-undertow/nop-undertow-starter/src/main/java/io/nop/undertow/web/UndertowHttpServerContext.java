@@ -24,6 +24,7 @@ import io.undertow.util.HttpString;
  */
 public class UndertowHttpServerContext implements IHttpServerContext {
     private final HttpServerExchange exchange;
+    private String characterEncoding;
 
     private IContext nopContext;
 
@@ -151,6 +152,8 @@ public class UndertowHttpServerContext implements IHttpServerContext {
 
     @Override
     public void setResponseContentType(String contentType) {
+        if (characterEncoding != null && !contentType.contains("charset="))
+            contentType += ";charset=" + characterEncoding;
         setResponseHeader(Headers.CONTENT_TYPE_STRING, contentType);
     }
 
@@ -175,5 +178,14 @@ public class UndertowHttpServerContext implements IHttpServerContext {
     @Override
     public void setContext(IContext context) {
         this.nopContext = context;
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        this.characterEncoding = encoding;
+        String contentType = getResponseContentType();
+        if (contentType != null) {
+            setResponseContentType(contentType);
+        }
     }
 }

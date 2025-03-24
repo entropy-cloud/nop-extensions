@@ -153,4 +153,9 @@ public class SolonServerContext implements IHttpServerContext {
     public void setContext(IContext context) {
         this.nopContext = context;
     }
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        context.charset(encoding);
+    }
 }
