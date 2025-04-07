@@ -99,7 +99,7 @@ public class UndertowFileHandler extends AbstractGraphQLFileService implements F
                 return uploadAsync(buildApiRequest(exchange, req));
             });
         } catch (IOException e) {
-            future = FutureHelper.success(ErrorMessageManager.instance().buildResponse(locale, e));
+            future = FutureHelper.success(ErrorMessageManager.instance().buildResponseForException(locale, e));
         }
 
         return future.thenApply(resp -> sendJsonData(exchange, resp));
