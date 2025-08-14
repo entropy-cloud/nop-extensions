@@ -64,6 +64,16 @@ public class SolonServerContext implements IHttpServerContext {
     }
 
     @Override
+    public String getRemoteAddr() {
+        return context.remoteIp();
+    }
+
+    @Override
+    public int getRemotePort() {
+        return context.remotePort();
+    }
+
+    @Override
     public Object getRequestHeader(String headerName) {
         return context.header(headerName);
     }

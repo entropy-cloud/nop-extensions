@@ -1,10 +1,5 @@
 package io.nop.undertow.web;
 
-import java.net.HttpCookie;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionStage;
-
 import io.nop.api.core.context.IContext;
 import io.nop.api.core.convert.ConvertHelper;
 import io.nop.api.core.util.FutureHelper;
@@ -17,6 +12,13 @@ import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
+
+import java.net.HttpCookie;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionStage;
 
 /**
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
@@ -89,6 +91,25 @@ public class UndertowHttpServerContext implements IHttpServerContext {
     }
 
     @Override
+    public String getRemoteAddr() {
+        SocketAddress addr = exchange.getConnection().getPeerAddress();
+        if (addr instanceof InetSocketAddress) {
+            return ((InetSocketAddress) addr).getAddress().getHostAddress();
+        }
+        return addr.toString();
+    }
+
+    @Override
+    public int getRemotePort() {
+        SocketAddress addr = exchange.getConnection().getPeerAddress();
+        if (addr instanceof InetSocketAddress) {
+            return ((InetSocketAddress) addr).getPort();
+        }
+        return -1;
+    }
+
+
+    @Override
     public void removeCookie(String name) {
         Cookie cookie = this.exchange.getRequestCookie(name);
 
@@ -159,7 +180,7 @@ public class UndertowHttpServerContext implements IHttpServerContext {
 
     @Override
     public IAsyncBody getRequestBody() {
-        String[] receiver = new String[] { null };
+        String[] receiver = new String[]{null};
         UndertowWebHelper.consumeRequestBody(this.exchange, (body) -> receiver[0] = body);
 
         return () -> FutureHelper.futureCall(() -> receiver[0]);
