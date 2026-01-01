@@ -16,7 +16,7 @@ mvn clean install -DskipTests
 
 > 需确保已本地构建 https://gitee.com/canonical-entropy/nop-entropy 项目。
 
-也可以参考 https://nop.repo.crazydan.io/ 的说明配置并引入 Nop 仓库。
+也可以参考 https://repo.nop.crazydan.io/ 的说明配置并引入 Nop 仓库。
 
 ## 引入依赖
 
@@ -35,7 +35,7 @@ mvn clean install -DskipTests
 ```xml
   <dependency>
     <groupId>io.github.entropy-cloud</groupId>
-    <artifactId>nop-file-core</artifactId>
+    <artifactId>nop-biz-file-core</artifactId>
   </dependency>
 
   <!-- 本地存储方式 -->
