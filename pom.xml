@@ -38,7 +38,7 @@
         <!-- 自定义仓库1 -->
         <repository>
             <id>nop-snapshot-repo</id>
-            <url>https://nop.repo.crazydan.io/</url>
+            <url>https://repo.nop.crazydan.io/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>

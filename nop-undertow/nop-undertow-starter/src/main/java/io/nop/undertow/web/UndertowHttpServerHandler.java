@@ -1,13 +1,18 @@
 package io.nop.undertow.web;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
 import io.nop.api.core.ioc.BeanContainer;
 import io.nop.api.core.util.OrderedComparator;
 import io.nop.commons.util.ClassHelper;
+import io.nop.commons.util.StringHelper;
 import io.nop.http.api.server.HttpServerHelper;
 import io.nop.http.api.server.IHttpServerContext;
 import io.nop.http.api.server.IHttpServerFilter;
@@ -23,7 +28,9 @@ import io.undertow.server.handlers.encoding.ContentEncodingRepository;
 import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
+import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.server.handlers.resource.PreCompressedResourceSupplier;
+import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.server.handlers.resource.ResourceSupplier;
@@ -77,11 +84,15 @@ public class UndertowHttpServerHandler implements HttpHandler {
     }
 
     private HttpHandler createHandler() {
-        ResourceManager resourceManager = new ClassPathResourceManager(getClass().getClassLoader(),
-                                                                       "META-INF/resources");
-        // 对包含预压缩的资源（.gz 后缀），则优先返回其对应的压缩文件
-        ResourceSupplier resourceSupplier = new PreCompressedResourceSupplier(resourceManager).addEncoding("gzip",
-                                                                                                           ".gz");
+        String staticDir = UndertowConfigs.CFG_SERVER_STATIC_DIR.get();
+        List<ResourceManager> resourceManagers = Arrays.asList(
+                // 外部资源优先
+                StringHelper.isEmpty(staticDir) ? null : new FileResourceManager(new File(staticDir)),
+                new ClassPathResourceManager(getClass().getClassLoader(), "META-INF/resources")
+                //
+        );
+
+        ResourceSupplier resourceSupplier = new CompositeResourceSupplier(resourceManagers);
         HttpHandler resourceHandler = new ResourceHandler(resourceSupplier);
 
         // Note: ResourceHandler 会在新线程中执行后继的 HttpHandler，
@@ -120,5 +131,28 @@ public class UndertowHttpServerHandler implements HttpHandler {
         }
 
         return handler;
+    }
+
+    private static class CompositeResourceSupplier implements ResourceSupplier {
+        private final ResourceSupplier[] suppliers;
+
+        CompositeResourceSupplier(List<ResourceManager> managers) {
+            this.suppliers = managers.stream().filter(Objects::nonNull).map((manager) -> {
+                // 若包含预压缩的资源（{@code .gz} 后缀），则优先返回其对应的压缩文件
+                return new PreCompressedResourceSupplier(manager).addEncoding("gzip", ".gz");
+            }).toArray(ResourceSupplier[]::new);
+        }
+
+        @Override
+        public Resource getResource(HttpServerExchange exchange, String path) throws IOException {
+            for (ResourceSupplier supplier : this.suppliers) {
+                Resource resource = supplier.getResource(exchange, path);
+
+                if (resource != null) {
+                    return resource;
+                }
+            }
+            return null;
+        }
     }
 }
