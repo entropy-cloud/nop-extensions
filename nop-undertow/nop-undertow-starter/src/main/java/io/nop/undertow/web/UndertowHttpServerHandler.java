@@ -138,8 +138,12 @@ public class UndertowHttpServerHandler implements HttpHandler {
 
         CompositeResourceSupplier(List<ResourceManager> managers) {
             this.suppliers = managers.stream().filter(Objects::nonNull).map((manager) -> {
-                // 若包含预压缩的资源（{@code .gz} 后缀），则优先返回其对应的压缩文件
-                return new PreCompressedResourceSupplier(manager).addEncoding("gzip", ".gz");
+                // 若包含预压缩的资源，则优先返回其对应的压缩文件
+                PreCompressedResourceSupplier supplier = new PreCompressedResourceSupplier(manager);
+
+                return supplier.addEncoding("br", ".br") //
+                               .addEncoding("zstd", ".zst") //
+                               .addEncoding("gzip", ".gz");
             }).toArray(ResourceSupplier[]::new);
         }
 
