@@ -8,6 +8,7 @@ import io.nop.http.api.server.IHttpServerContext;
 import org.noear.solon.core.NvMap;
 import org.noear.solon.core.handle.Context;
 
+import java.io.InputStream;
 import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -114,6 +115,12 @@ public class SolonServerContext implements IHttpServerContext {
         context.status(httpStatus);
         if (!StringHelper.isEmpty(body))
             context.output(body);
+    }
+
+    @Override
+    public void sendResponse(int httpStatus, InputStream body) {
+        context.status(httpStatus);
+        context.output(body);
     }
 
     @Override

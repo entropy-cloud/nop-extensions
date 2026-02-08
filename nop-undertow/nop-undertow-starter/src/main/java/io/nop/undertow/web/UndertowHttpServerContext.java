@@ -1,8 +1,20 @@
 package io.nop.undertow.web;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpCookie;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
 import io.nop.api.core.context.IContext;
 import io.nop.api.core.convert.ConvertHelper;
+import io.nop.api.core.exceptions.NopException;
 import io.nop.api.core.util.FutureHelper;
+import io.nop.commons.util.IoHelper;
 import io.nop.commons.util.StringHelper;
 import io.nop.http.api.HttpStatus;
 import io.nop.http.api.server.IAsyncBody;
@@ -12,13 +24,6 @@ import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-
-import java.net.HttpCookie;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionStage;
 
 /**
  * @author <a href="mailto:flytreeleft@crazydan.org">flytreeleft</a>
@@ -108,7 +113,6 @@ public class UndertowHttpServerContext implements IHttpServerContext {
         return -1;
     }
 
-
     @Override
     public void removeCookie(String name) {
         Cookie cookie = this.exchange.getRequestCookie(name);
@@ -157,6 +161,21 @@ public class UndertowHttpServerContext implements IHttpServerContext {
     }
 
     @Override
+    public void sendResponse(int httpStatus, InputStream body) {
+        this.exchange.setStatusCode(httpStatus);
+
+        // 消除异常 "UT000035: Cannot get stream as startBlocking has not been invoked"
+        this.exchange.startBlocking();
+
+        try (OutputStream out = this.exchange.getOutputStream()) {
+            IoHelper.copy(body, out);
+            out.flush();
+        } catch (Exception e) {
+            throw NopException.adapt(e);
+        }
+    }
+
+    @Override
     public boolean isResponseSent() {
         return false;
     }
@@ -173,14 +192,15 @@ public class UndertowHttpServerContext implements IHttpServerContext {
 
     @Override
     public void setResponseContentType(String contentType) {
-        if (characterEncoding != null && !contentType.contains("charset="))
+        if (characterEncoding != null && !contentType.contains("charset=")) {
             contentType += ";charset=" + characterEncoding;
+        }
         setResponseHeader(Headers.CONTENT_TYPE_STRING, contentType);
     }
 
     @Override
     public IAsyncBody getRequestBody() {
-        String[] receiver = new String[]{null};
+        String[] receiver = new String[] { null };
         UndertowWebHelper.consumeRequestBody(this.exchange, (body) -> receiver[0] = body);
 
         return () -> FutureHelper.futureCall(() -> receiver[0]);
@@ -188,7 +208,13 @@ public class UndertowHttpServerContext implements IHttpServerContext {
 
     @Override
     public CompletionStage<Object> executeBlocking(Callable<?> task) {
-        return FutureHelper.futureCall(task);
+        CompletableFuture<Object> future = new CompletableFuture<>();
+
+        this.exchange.dispatch(() -> {
+            CompletionStage<Object> promise = FutureHelper.futureCall(task);
+            FutureHelper.bindResult(promise, future);
+        });
+        return future;
     }
 
     @Override
